@@ -1,0 +1,8 @@
+[package]
+name = "ruboxer"
+version = "0.1.0"
+authors = ["Donald Sebastian Leung"]
+edition = "2018"
+
+[dependencies]
+nix = "0.21.0"
