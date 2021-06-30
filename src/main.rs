@@ -3,9 +3,11 @@ use std::process;
 use std::ffi::*;
 use nix::unistd::*;
 use nix::sched::*;
-use nix::sys::wait::wait;
+use nix::sys::wait::*;
+use nix::sys::stat::*;
+use nix::fcntl::*;
 
-static USAGE: &str = "Usage:\n  ruboxer [-h | --help | -v | --version]\n  ruboxer <directory> <command> [<arguments>]";
+static USAGE: &str = "Usage:\n  ruboxer [-h | --help | -v | --version]\n  ruboxer [--ns-pid <pid>] <directory> <command> [<arguments>]";
 static VERSION: &str = "0.1.0";
 
 fn main() {
@@ -42,14 +44,74 @@ fn main() {
       }
     }
   }
-  let mut unshare_flags = CloneFlags::empty();
-  unshare_flags.insert(CloneFlags::CLONE_NEWPID);
-  unshare_flags.insert(CloneFlags::CLONE_NEWNS);
-  match unshare(unshare_flags) {
-    Ok(()) => (),
-    Err(error) => {
-      println!("{}", error);
-      process::exit(1);
+  let mut ns_pid: Option<i32> = None;
+  let mut i = 1;
+  while i < args.len() {
+    match &args[i][..] {
+      "--ns-pid" => {
+        match ns_pid {
+          Some(_) => {
+            println!("Fatal error: --ns-pid option cannot be specified more than once");
+            process::exit(1);
+          },
+          None => ()
+        };
+        i += 1;
+        if i >= args.len() {
+          println!("Fatal error: --ns-pid option should be followed by a PID number");
+          process::exit(1);
+        }
+        let try_pid = args[i].parse::<i32>();
+        match try_pid {
+          Ok(pid) => {
+            if pid < 1 {
+              println!("Fatal error: the PID in --ns-pid must be a positive integer");
+              process::exit(1);
+            }
+            ns_pid = Some(pid);
+          },
+          Err(error) => {
+            println!("{}", error);
+            process::exit(1);
+          }
+        };
+      },
+      _ => break
+    }
+    i += 1;
+  }
+  if i + 1 >= args.len() {
+    println!("{}", USAGE);
+    process::exit(1);
+  }
+  match ns_pid {
+    Some(pid) => {
+      let ns_pid_path = format!("/proc/{}/ns/pid", pid);
+      match open(&ns_pid_path[..], OFlag::O_RDONLY, Mode::empty()) {
+        Ok(pid_ns_fd) => match setns(pid_ns_fd, CloneFlags::CLONE_NEWPID) {
+          Ok(()) => (),
+          Err(error) => {
+            println!("{}", error);
+            process::exit(1);
+          }
+        },
+        Err(error) => {
+          println!("{}", error);
+          process::exit(1);
+        }
+      };
+    },
+    None => {
+      let mut unshare_flags = CloneFlags::empty();
+      unshare_flags.insert(CloneFlags::CLONE_NEWPID);
+      unshare_flags.insert(CloneFlags::CLONE_NEWNS);
+      match unshare(unshare_flags) {
+        Ok(()) => (),
+        Err(error) => {
+          println!("{}", error);
+          process::exit(1);
+        }
+      };
     }
   };
   match unsafe{fork()} {
@@ -69,21 +131,21 @@ fn main() {
       process::exit(1);
     }
   };
-  match chdir(&args[1][..]) {
+  match chdir(&args[i][..]) {
     Ok(()) => (),
     Err(error) => {
       println!("{}", error);
       process::exit(1);
     }
   };
-  match chroot(&args[1][..]) {
+  match chroot(&args[i][..]) {
     Ok(()) => (),
     Err(error) => {
       println!("{}", error);
       process::exit(1);
     }
   };
-  match execvp(&args_cstr[2], &args_cstr[2..]) {
+  match execvp(&args_cstr[i + 1], &args_cstr[(i + 1)..]) {
     Ok(_) => (),
     Err(error) => {
       println!("{}", error);
