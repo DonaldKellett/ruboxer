@@ -89,7 +89,13 @@ fn main() {
       let ns_pid_path = format!("/proc/{}/ns/pid", pid);
       match open(&ns_pid_path[..], OFlag::O_RDONLY, Mode::empty()) {
         Ok(pid_ns_fd) => match setns(pid_ns_fd, CloneFlags::CLONE_NEWPID) {
-          Ok(()) => (),
+          Ok(()) => match close(pid_ns_fd) {
+            Ok(()) => (),
+            Err(error) => {
+              println!("{}", error);
+              process::exit(1);
+            }
+          },
           Err(error) => {
             println!("{}", error);
             process::exit(1);
