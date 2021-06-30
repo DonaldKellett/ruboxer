@@ -2,6 +2,8 @@ use std::env;
 use std::process;
 use std::ffi::*;
 use nix::unistd::*;
+use nix::sched::*;
+use nix::sys::wait::wait;
 
 static USAGE: &str = "Usage:\n  ruboxer [-h | --help | -v | --version]\n  ruboxer <directory> <command> [<arguments>]";
 static VERSION: &str = "0.1.0";
@@ -12,7 +14,7 @@ fn main() {
   if try_args_cstr.iter().any(|x| match x { Ok(_) => false, _ => true }) {
     println!("Fatal error: interior NUL byte found in one or more arguments");
     process::exit(1);
-  };
+  }
   let mut args_cstr: Vec<CString> = Vec::new();
   for x in try_args_cstr {
     match x {
@@ -40,6 +42,33 @@ fn main() {
       }
     }
   }
+  let mut unshare_flags = CloneFlags::empty();
+  unshare_flags.insert(CloneFlags::CLONE_NEWPID);
+  unshare_flags.insert(CloneFlags::CLONE_NEWNS);
+  match unshare(unshare_flags) {
+    Ok(()) => (),
+    Err(error) => {
+      println!("{}", error);
+      process::exit(1);
+    }
+  };
+  match unsafe{fork()} {
+    Ok(ForkResult::Parent { .. }) => {
+      match wait() {
+        Ok(_) => (),
+        Err(error) => {
+          println!("{}", error);
+          process::exit(1);
+        }
+      };
+      process::exit(0);
+    },
+    Ok(ForkResult::Child) => (),
+    Err(error) => {
+      println!("{}", error);
+      process::exit(1);
+    }
+  };
   match chdir(&args[1][..]) {
     Ok(()) => (),
     Err(error) => {
