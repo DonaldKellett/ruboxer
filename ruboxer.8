@@ -6,7 +6,7 @@ ruboxer - Rudimentary container tool for Linux
 [-h | --help | -v | --version]
 .PP
 .B "ruboxer "
-[--ns-pid <pid>] <directory> <command> [<arguments>]
+[--procns-pid <pid>] [--mem-max-bytes <bytes>] <directory> <command> [<arguments>]
 .SH DESCRIPTION
 A rudimentary tool for running containers from unpacked images in Linux.
 .PP
@@ -20,11 +20,14 @@ Print the help message
 Display the current version
 .RE
 .PP
-.B --ns-pid <pid>
+.B --procns-pid <pid>
 .RS
 Join the process namespace with PID <pid>. The default is to create a new process namespace
 .RE
-.B 
+.B --mem-max-bytes <bytes>
+.RS
+Limit the memory+swap usage of container processes (cumulative) to the specified number of bytes. Defaults to 128MiB. Supports the binary prefixes (in ascending order): K, M, G, T, P, E
+.RE
 .SH NOTES
 This tool is rudimentary and offers limited security so it should only be used as an educational tool for introductory operating system courses. For production use, there exist more robust alternatives such as Docker and Kubernetes.
 .SH SEE ALSO
