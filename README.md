@@ -11,6 +11,16 @@ Rudimentary container tool for Linux
 
 ## Installing
 
+### From the provided RPM (CentOS 8 Stream and similar systems)
+
+Download the RPM and install:
+
+```bash
+$ wget https://github.com/DonaldKellett/ruboxer/releases/download/v0.1.0/ruboxer-0.1.0-1.el8.x86_64.rpm && sudo dnf install ./ruboxer-0.1.0-1.el8.x86_64.rpm
+```
+
+Invoke the binary as `ruboxer`. A man page is available as well: `$ man 8 ruboxer`
+
 ### From source
 
 Ensure Rust and Cargo are installed.
