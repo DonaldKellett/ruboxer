@@ -9,6 +9,8 @@ Rudimentary container tool for Linux
 - Rust as a systems programming language, a type and memory-safe alternative to C
 - System calls and features exported by the Linux kernel used in modern container runtimes such as Docker and Kubernetes
 
+More details on Ruboxer (including a walkthrough with examples) can be found in this [blog post on dev.to](https://dev.to/donaldsebleung/containers-from-first-principles-with-rust-2211).
+
 ## Installing
 
 ### From the provided RPM (CentOS 8 Stream and similar systems)
