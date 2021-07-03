@@ -1,0 +1,2 @@
+target/release/ruboxer usr/bin/
+ruboxer.8 usr/share/man/man8/

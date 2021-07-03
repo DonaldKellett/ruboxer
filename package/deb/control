@@ -1,0 +1,13 @@
+Source: ruboxer
+Section: admin
+Priority: optional
+Maintainer: Donald Sebastian Leung <donaldsebleung@gmail.com>
+Build-Depends: debhelper-compat (= 12), cargo
+Standards-Version: 4.4.1
+Homepage: https://github.com/DonaldKellett/ruboxer
+
+Package: ruboxer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Rudimentary container tool for Linux
+ A rudimentary tool for running containers from unpacked images in Linux.

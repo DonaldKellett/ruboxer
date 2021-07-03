@@ -21,6 +21,16 @@ $ wget https://github.com/DonaldKellett/ruboxer/releases/download/v0.1.0/ruboxer
 
 Invoke the binary as `ruboxer`. A man page is available as well: `$ man 8 ruboxer`
 
+### From the provided deb (Ubuntu 20.04 LTS and similar systems)
+
+Download the deb and install:
+
+```bash
+$ wget https://github.com/DonaldKellett/ruboxer/releases/download/v0.1.0/ruboxer_0.1.0_amd64.deb && sudo apt install ./ruboxer_0.1.0_amd64.deb
+```
+
+Invoke the binary as `ruboxer`. A man page is available as well: `$ man 8 ruboxer`
+
 ### From source
 
 Ensure Rust and Cargo are installed.

@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ruboxer
+Upstream-Contact: Donald Sebastian Leung <donaldsebleung@gmail.com>
+Source: https://github.com/DonaldKellett/ruboxer/archive/refs/tags/v0.1.0.tar.gz
+
+Files: *
+Copyright: 2021 Donald Sebastian Leung <donaldsebleung@gmail.com>
+License: MIT
